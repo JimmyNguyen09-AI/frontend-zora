@@ -14,10 +14,10 @@ export default function TypingTitle({ words }: TypingWord) {
                     words={words}
                     loop={0}
                     cursor
-                    cursorStyle="|"
-                    typeSpeed={70}
+                    cursorStyle="❊"
+                    typeSpeed={60}
                     deleteSpeed={50}
-                    delaySpeed={1500}
+                    delaySpeed={1700}
                 />
             </span>
         </h2>

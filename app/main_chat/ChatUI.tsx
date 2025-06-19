@@ -14,6 +14,7 @@ import { useTheme } from 'next-themes'
 import { ModeToggle } from '../_components/DarkMode'
 import Image from 'next/image'
 import TypingTitle from './_components/Typer'
+import ChatHeader from './_components/ChatHeader'
 interface Message {
     question: string
     answer: string
@@ -48,6 +49,7 @@ export default function ChatUI({ userID }: { userID: number }) {
     const [toDeleteID, setToDeleteID] = useState<number | null>(null)
     const [showWebSearches, setShowWebSearches] = useState(false)
     const { theme, setTheme } = useTheme()
+    const [voiceRecording, setVoiceRecording] = useState<boolean>(false)
     useEffect(() => {
         if (!userID) return
         fetch(`http://127.0.0.1:8000/conversations/user/${userID}`)
@@ -287,21 +289,22 @@ export default function ChatUI({ userID }: { userID: number }) {
             {/* Main Chat */}
             <main className="flex-1 flex flex-col">
                 {/* Header */}
-                <div className="fixed top-0 left-0 w-full z-50 flex justify-between items-center p-4 ">
-                    <Image src="/logo-JN.png" alt="Logo" width={50} height={50} />
-                    <div>
-                        <button onClick={() => setShowHistory(prev => !prev)} className='text-black dark:text-white mr-2 hover:bg-white/10 rounded-full p-2 cursor-pointer'>
-                            <TextSearch size={24} />
-                        </button>
-                        <ModeToggle theme={theme} setTheme={setTheme} />
-                    </div>
-
-                </div>
+                <ChatHeader
+                    onToggleHistory={() => setShowHistory(prev => !prev)}
+                    theme={theme}
+                    setTheme={setTheme}
+                />
 
                 {/* Chat Content */}
-                <div ref={containerRef} className="flex-1 w-[80%] mx-auto overflow-y-auto p-6 space-y-6 bg-white dark:bg-[#1a1a1a] ">
+                <div ref={containerRef} className="flex-1 mx- w-[95%] md:w-[80%] ml-[2.5%] md:mx-auto overflow-y-auto p-6 space-y-6 bg-white dark:bg-[#1a1a1a] ">
+
                     {!messages.length && (
-                        <div className='flex justify-center items-center h-[80%]'><TypingTitle words={['Chat with me!', 'Chat with me!', 'Chat with me!']} /></div>
+                        <div className="flex flex-col items-center justify-center h-[70%]">
+                            <Image src="/ai-unscreen.gif" alt="Logo" width={200} height={200} />
+                            <div className='flex justify-center items-center '><TypingTitle words={['Hỏi ZORA bất cứ điều gì ^^', 'Ngày hôm nay của hôm mie thế nào ^^', 'Oh sheet tôi đã lỡ va phải ánh mắt của bạn :3', 'Chat với tôi nhé :>']} />
+                            </div>
+                        </div>
+
 
                     )
                     }
@@ -310,7 +313,7 @@ export default function ChatUI({ userID }: { userID: number }) {
                             {/* User message */}
                             <div className="flex justify-end">
                                 <div className="flex gap-2 max-w-[75%] items-end">
-                                    <div className="bg-[#2d2d2d] text-white px-4 py-3 rounded-2xl rounded-br-none shadow text-sm whitespace-pre-wrap">
+                                    <div className="bg-black/10 dark:bg-[#2d2d2d] text-black dark:text-white px-4 py-3 rounded-2xl rounded-br-none shadow text-sm whitespace-pre-wrap">
                                         {m.question}
                                     </div>
                                 </div>
@@ -318,8 +321,29 @@ export default function ChatUI({ userID }: { userID: number }) {
 
                             {/* AI message */}
                             <div className="flex justify-start ">
-                                <div className="flex gap-2 max-w-[90%] items-start">
-                                    <div className=" p-4 rounded-2xl rounded-tl-none shadow-inner prose prose-invert prose-sm max-w-full overflow-x-auto text-sm leading-relaxed">
+                                <div className="flex max-w-[90%] items-start">
+                                    <div className="w-9 h-9 rounded-full flex-shrink-0 overflow-hidden">
+                                        {i === messages.length - 1 && isStreaming ? (
+                                            <Image
+                                                src="/loading.gif"
+                                                alt="Loading"
+                                                width={36}
+                                                height={36}
+                                                className="object-contain w-full h-full"
+                                            />
+                                        ) : (
+                                            <Image
+                                                src="/logo-JN.png"
+                                                alt="Bot"
+                                                width={36}
+                                                height={36}
+                                                className="object-contain w-full h-full"
+                                            />
+                                        )}
+                                    </div>
+
+
+                                    <div className="pl-2 mt-2 text-black dark:text-white rounded-2xl overflow-x-auto text-sm leading-relaxed">
                                         <ReactMarkdown
                                             remarkPlugins={[remarkGfm]}
                                             components={{
@@ -329,7 +353,7 @@ export default function ChatUI({ userID }: { userID: number }) {
                                                     return !inline && match ? (
                                                         <CodeBlock language={match[1]} code={codeString.trim()} />
                                                     ) : (
-                                                        <code className="bg-gray-800 text-green-300 rounded px-1 font-mono text-sm" {...props}>
+                                                        <code className="bg-gray-600 dark:bg-gray-800 text-green-300 rounded px-1 font-mono text-sm" {...props}>
                                                             {codeString}
                                                         </code>
                                                     );
@@ -376,7 +400,7 @@ export default function ChatUI({ userID }: { userID: number }) {
                     {isStreaming && messages[messages.length - 1]?.answer === '' && (
                         <div className="flex justify-start">
                             <div className="flex gap-2 max-w-[80%] items-start">
-                                <div className="bg-[#1e1e1e] px-4 py-3 rounded-2xl rounded-tl-none shadow-inner text-sm text-gray-400 animate-pulse">
+                                <div className="bg-while/20 dark:bg-[#1e1e1e] px-4 py-3 rounded-2xl rounded-tl-none shadow-inner text-sm text-gray-800 animate-pulse">
                                     Thinking...
                                 </div>
                             </div>
@@ -388,7 +412,7 @@ export default function ChatUI({ userID }: { userID: number }) {
                 </div>
 
                 {/* Chat Input */}
-                <div className="px-2 w-[80%] mx-auto bg-[#1a1a1a] border-t-2 border-gray-800 rounded-t-4xl shadow-[0_-8px_24px_rgba(0,0,0,0.4)]">
+                <div className="px-2 w-full md:w-[80%] mx-auto robg-[#1a1a1a] border-t-2 border-gray-800 rounded-t-4xl shadow-[0_-8px_24px_rgba(0,0,0,0.4)]">
                     <ChatInput
                         onSend={(text) => handleSend(text, deepResearch)}
                         isStreaming={isStreaming}
@@ -399,6 +423,8 @@ export default function ChatUI({ userID }: { userID: number }) {
                         }}
                         deepResearch={deepResearch}
                         setDeepResearch={setDeepResearch}
+                        voiceRecording={voiceRecording}
+                        setVoiceRecording={setVoiceRecording}
                     />
                 </div>
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { Send, Paperclip, LoaderPinwheel, X, PencilOff } from 'lucide-react'
+import { Send, Paperclip, LoaderPinwheel, X, PencilOff, AudioLines, EarOff } from 'lucide-react'
 
 const ACCEPTED_TYPES = [
     'application/pdf',
@@ -16,7 +16,9 @@ export default function ChatInput({
     isStreaming,
     onStop,
     deepResearch,
-    setDeepResearch
+    setDeepResearch,
+    voiceRecording,
+    setVoiceRecording
 
 }: {
     onSend: (text: string) => void
@@ -24,6 +26,8 @@ export default function ChatInput({
     onStop: () => void
     deepResearch: boolean
     setDeepResearch: React.Dispatch<React.SetStateAction<boolean>>
+    voiceRecording: boolean
+    setVoiceRecording: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const [input, setInput] = useState('')
     const [attachedFiles, setAttachedFiles] = useState<File[]>([])
@@ -83,13 +87,13 @@ export default function ChatInput({
     }
 
     return (
-        <div className="w-[full]  px-3 py-4  ">
-            <div className="bg-[#1f1f1f] border border-[#333] rounded-full px-5 py-3 flex items-center gap-3 shadow-lg focus-within:ring-2 focus-within:ring-white/20 transition-all">
+        <div className="w-[full] rounded-md px-3 py-4  ">
+            <div className="bg-white dark:bg-[#1f1f1f] border border-[#333] rounded-full px-5 py-3 flex items-center gap-3 shadow-lg focus-within:ring-2 focus-within:ring-white/20 transition-all">
                 {/* Attach button */}
                 <div className="relative">
                     <button
                         onClick={handleAttachClick}
-                        className="text-white hover:text-gray-300 transition disabled:cursor-not-allowed cursor-pointer"
+                        className="text-black dark:text-white hover:text-gray-300 transition disabled:cursor-not-allowed cursor-pointer"
                         disabled={attachedFiles.length >= MAX_FILES}
                     >
                         <Paperclip size={20} />
@@ -113,7 +117,7 @@ export default function ChatInput({
                 {/* Text input */}
                 <textarea
                     rows={1}
-                    className="flex-1 bg-transparent text-white resize-none focus:outline-none placeholder-gray-400 text-sm max-h-32 overflow-y-auto leading-[22px]"
+                    className="flex-1 dark:bg-transparent text-black dark:text-white resize-none focus:outline-none placeholder-gray-400 text-md max-h-32 overflow-y-auto leading-[22px]"
                     placeholder="Ask me anything..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -130,12 +134,27 @@ export default function ChatInput({
                     }}
                     disabled={isStreaming}
                 />
-
+                {/* voice record */}
+                {voiceRecording ? (
+                    <button
+                        onClick={() => setVoiceRecording(false)}
+                        className="bg-black/20 text-black dark:bg-white  p-2 rounded-full hover:opacity-90 disabled:opacity-50 transition cursor-pointer  "
+                    >
+                        <AudioLines size={16} />
+                    </button>
+                ) : (
+                    <button
+                        onClick={() => setVoiceRecording(true)}
+                        className="bg-black/20 text-black dark:bg-white  p-2 rounded-full hover:opacity-90 disabled:opacity-50 transition cursor-pointer  "
+                    >
+                        <EarOff size={16} />
+                    </button>
+                )}
                 {/* Gửi hoặc Stop */}
                 {isStreaming ? (
                     <button
                         onClick={onStop}
-                        className="bg-white text-black p-2 rounded-full hover:opacity-90 disabled:opacity-50 transition cursor-pointer  "
+                        className="bg-black/20 text-black dark:bg-white  p-2 rounded-full hover:opacity-90 disabled:opacity-50 transition cursor-pointer  "
                     >
                         <PencilOff size={16} />
                     </button>
@@ -143,11 +162,12 @@ export default function ChatInput({
                     <button
                         onClick={handleSend}
                         disabled={!input.trim()}
-                        className="bg-white text-black p-2 rounded-full hover:opacity-90 disabled:opacity-50 transition"
+                        className="bg-black/20 text-black dark:bg-white  p-2 rounded-full hover:opacity-90 disabled:opacity-50 transition cursor-pointer"
                     >
                         <Send size={16} />
                     </button>
                 )}
+
             </div>
 
             {/* Files list */}
@@ -176,12 +196,12 @@ export default function ChatInput({
             )}
 
             {/* Deep Research */}
-            <div className="flex flex-wrap gap-2 mt-4 text-md">
+            <div className="flex flex-wrap gap-2 mt-4 text-md text-black dark:text-white">
                 <ActionButton
                     label="Deep Research"
                     icon={
                         <LoaderPinwheel
-                            className={`${deepResearch ? 'animate-spin ease duration-1000' : ''}`}
+                            className={`${deepResearch ? 'animate-spin ease duration-1000' : ''} `}
                             size={20}
                         />
                     }
@@ -210,7 +230,7 @@ function ActionButton({
         <button
             onClick={action}
             className={`flex items-center gap-2 cursor-pointer px-4 py-2 rounded-full transition-all
-        ${state ? 'bg-white/40 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}
+        ${state ? 'bg-black/50 text-black dark:bg-white/50 dark:text-white' : 'bg-black/90 text-white hover:bg-black/50 dark:bg-white/90 dark:text-black dark:hover:bg-white/20'} `}
         >
             {typeof icon === 'string' ? <span>{icon}</span> : icon}
             <span>{label}</span>

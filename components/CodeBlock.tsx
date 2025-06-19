@@ -19,8 +19,8 @@ export default function CodeBlock({ language, code }: CodeBoxProps) {
     }
 
     return (
-        <div className="relative rounded-xl overflow-hidden border border-gray-700 bg-[#1e1e1e] shadow-md mb-7">
-            <div className="flex items-center justify-between px-4 py-2 bg-[#2d2d2d] border-b border-gray-700 text-sm font-mono">
+        <div className="relative rounded-xl overflow-hidden border dark:border-gray-700 dark:bg-[#1e1e1e] shadow-md mb-7">
+            <div className="flex items-center justify-between px-4 py-2 bg-white/40 border-black dark:bg-[#2d2d2d] border-b border-gray-700 text-sm font-mono">
                 <div className="flex space-x-2">
                     <span className="w-3 h-3 rounded-full bg-red-500"></span>
                     <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
@@ -28,14 +28,14 @@ export default function CodeBlock({ language, code }: CodeBoxProps) {
                 </div>
                 <div className='flex space-x-2 items-center'>
                     <Terminal size={16} />
-                    <span className="text-gray-300">{language}</span>
+                    <span className="text-black dark:text-gray-300">{language}</span>
                 </div>
 
                 <button onClick={handleCopy} title="Copy" className="text-gray-400 cursor-pointer hover:text-white">
                     {copied ? (
                         <CopyCheck size={16} className="text-green-400" />
                     ) : (
-                        <Copy size={16} className="hover:animate-pulse" />
+                        <Copy size={16} className="hover:text-black dark:hover:animate-pulse " />
                     )}
                 </button>
 
@@ -54,11 +54,11 @@ export default function CodeBlock({ language, code }: CodeBoxProps) {
                 {code}
 
             </SyntaxHighlighter>
-            <div className=' absolute bottom-0 right-0 flex items-center justify-between p-2 text-xs text-gray-400'>
-                <div className="p-2 text-md text-gray-400">Made by JN-AI</div>
+            <div className=' absolute bottom-0 right-0 flex items-center justify-between p-2 text-xs text-black dark:text-gray-400'>
+                <div className="p-2 text-md text-black dark:text-gray-400">Made by JN-AI</div>
                 <Bot size={14} />
             </div>
-            <div className="items-center justify-between p-2 text-xs text-gray-400"></div>
+            <div className="items-center justify-between p-2 text-xs text-black dark:text-gray-400"></div>
         </div>
     )
 }
