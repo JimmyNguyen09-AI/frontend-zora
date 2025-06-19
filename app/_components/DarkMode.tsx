@@ -14,7 +14,7 @@ export function ModeToggle({ theme, setTheme }: ModeTheme) {
         <button
             onClick={() => setTheme(theme === "light" ? "dark" : "light")
             }
-            className="transition-colors duration-500 p-2 rounded-full border "
+            className="transition-colors cursor-pointer duration-500 p-2 rounded-full border "
         >
             {theme === "light" ? (
                 <Sun className="h-[1.2rem] w-[1.2rem]" color="black" />

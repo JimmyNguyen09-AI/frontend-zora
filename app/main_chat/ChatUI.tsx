@@ -7,11 +7,13 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import ChatInput from './_components/ChatInput'
 import CodeBlock from '../../components/CodeBlock'
-import ChatHistory from './_components/ChatHistory' // điều chỉnh đường dẫn nếu cần
-import { ChevronsLeft, Menu, PencilLine, Link } from "lucide-react"
+import ChatHistory from './_components/ChatHistory'
+import { ChevronsLeft, Menu, PencilLine, Link, ChevronsRight, X, TextSearch, Slash } from "lucide-react"
 import ConfirmBlock from '../../components/ConfirmBlock'
 import { useTheme } from 'next-themes'
 import { ModeToggle } from '../_components/DarkMode'
+import Image from 'next/image'
+import TypingTitle from './_components/Typer'
 interface Message {
     question: string
     answer: string
@@ -39,14 +41,13 @@ export default function ChatUI({ userID }: { userID: number }) {
     const currentMsgIndexRef = useRef<number>(-1)
     const [loading, setLoadingHistory] = useState<boolean>(true)
     const [error, setError] = useState("")
-    const [showSideBar, setShowSideBar] = useState<boolean>(false)
+    const [showHistory, setShowHistory] = useState<boolean>(false)
     const [webSearches, setWebSearches] = useState<string[]>([])
     const [deepResearch, setDeepResearch] = useState(false)
     const [confirmOpen, setConfirmOpen] = useState(false)
     const [toDeleteID, setToDeleteID] = useState<number | null>(null)
     const [showWebSearches, setShowWebSearches] = useState(false)
     const { theme, setTheme } = useTheme()
-
     useEffect(() => {
         if (!userID) return
         fetch(`http://127.0.0.1:8000/conversations/user/${userID}`)
@@ -258,46 +259,52 @@ export default function ChatUI({ userID }: { userID: number }) {
 
 
     return (
-        <div className="w-full h-screen flex bg-[#0f0f0f] text-white font-sans">
-            {/* Sidebar */}
-            <div
-                className={`fixed top-0 left-0 h-full w-64 bg-white/80 dark:bg-[#1a1a1a] border-r border-gray-800 p-4 space-y-4 overflow-y-auto z-50 transform transition-transform backdrop-filter backdrop-blur-sm duration-300 ease-in-out ${showSideBar ? 'translate-x-0' : '-translate-x-full'}`}
-            >
-                <button onClick={handleNewConversation} className='cursor-pointer text-black dark:text-white absolute top-4 left-5'>
-                    <PencilLine size={30} />
-                </button>
-                <button onClick={() => setShowSideBar(false)} className="absolute text-black dark:text-white top-4 right-2 cursor-pointer ">
-                    <ChevronsLeft size={30} />
-                </button>
+        <div className="w-full h-screen flex dark:bg-[#1a1a1a] text-white font-sans">
+            {/* History */}
+            {showHistory && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/10 backdrop-blur-sm">
+                    <div className="relative bg-white/80 dark:bg-[#1a1a1a] border border-gray-800 rounded-xl w-full max-w-sm max-h-[80vh] p-4 pt-12 overflow-y-auto text-black dark:text-white">
+                        <button onClick={handleNewConversation} className='cursor-pointer absolute top-2 left-2'>
+                            <PencilLine size={24} />
+                        </button>
+                        <button onClick={() => setShowHistory(false)} className="absolute top-2 right-2 cursor-pointer">
+                            <X size={24} />
+                        </button>
 
-                <ChatHistory
-                    history={history}
-                    selected={selected}
-                    onSelect={handleSelectHistory}
-                    onDelete={(id) => {
-                        setToDeleteID(id)
-                        setConfirmOpen(true)
-                    }}
-                />
-            </div>
+                        <ChatHistory
+                            history={history}
+                            selected={selected}
+                            onSelect={handleSelectHistory}
+                            onDelete={(id) => {
+                                setToDeleteID(id)
+                                setConfirmOpen(true)
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
 
             {/* Main Chat */}
             <main className="flex-1 flex flex-col">
                 {/* Header */}
-                <header className="flex gap-2 p-4 border-b border-gray-800 items-center bg-white dark:bg-[#1a1a1a] shadow rounded-md">
-                    <button onClick={() => setShowSideBar(prev => !prev)} className='text-white mr-4 cursor-pointer'>
-                        <Menu size={23} className='text-black dark:text-white' />
-                    </button>
+                <div className="fixed top-0 left-0 w-full z-50 flex justify-between items-center p-4 ">
+                    <Image src="/logo-JN.png" alt="Logo" width={50} height={50} />
+                    <div>
+                        <button onClick={() => setShowHistory(prev => !prev)} className='text-black dark:text-white mr-2 hover:bg-white/10 rounded-full p-2 cursor-pointer'>
+                            <TextSearch size={24} />
+                        </button>
+                        <ModeToggle theme={theme} setTheme={setTheme} />
+                    </div>
 
-                    <h1 className={`text-xl text-black dark:text-white font-semibold w-full ${showSideBar ? "text-center" : ""}`}>
-                        ZORA
-                        <span className='text-xs text-gray-500 dark:text-gray-100'>Beta version</span>
-                    </h1>
-                    <ModeToggle theme={theme} setTheme={setTheme} />
-                </header>
+                </div>
 
                 {/* Chat Content */}
-                <div ref={containerRef} className="flex-1 overflow-y-auto p-6 space-y-6 bg-white dark:bg-[#1a1a1a]">
+                <div ref={containerRef} className="flex-1 w-[80%] mx-auto overflow-y-auto p-6 space-y-6 bg-white dark:bg-[#1a1a1a] ">
+                    {!messages.length && (
+                        <div className='flex justify-center items-center h-[80%]'><TypingTitle words={['Chat with me!', 'Chat with me!', 'Chat with me!']} /></div>
+
+                    )
+                    }
                     {messages.map((m, i) => (
                         <div key={i} className="space-y-4">
                             {/* User message */}
@@ -310,9 +317,9 @@ export default function ChatUI({ userID }: { userID: number }) {
                             </div>
 
                             {/* AI message */}
-                            <div className="flex justify-start bg-white/80 dark:bg-[#1e1e1e]">
+                            <div className="flex justify-start ">
                                 <div className="flex gap-2 max-w-[90%] items-start">
-                                    <div className="bg-[#1e1e1e] p-4 rounded-2xl rounded-tl-none shadow-inner prose prose-invert prose-sm max-w-full overflow-x-auto text-sm leading-relaxed">
+                                    <div className=" p-4 rounded-2xl rounded-tl-none shadow-inner prose prose-invert prose-sm max-w-full overflow-x-auto text-sm leading-relaxed">
                                         <ReactMarkdown
                                             remarkPlugins={[remarkGfm]}
                                             components={{
@@ -336,11 +343,13 @@ export default function ChatUI({ userID }: { userID: number }) {
                                 </div>
                             </div>
                             {m.webSearches && m.webSearches.length > 0 && (
-                                <div className="pl-4">
+                                <div className="flex flex-row gap-4">
                                     {m.webSearches.map((url, i) => (
                                         <div key={`search-${i}`} className="flex items-center text-sm text-blue-400 rounded-lg py-1 max-w-[90%]">
-                                            <Link size={13} className="mr-1 text-white" />
-                                            <a href={url} target="_blank" className="underline break-all">{url}</a>
+                                            <Link size={10} className="ml-1 text-white" />
+
+                                            <a href={url} target="_blank" className="underline break-all">{
+                                                url.split("/")[2]}</a>
                                         </div>
                                     ))}
                                 </div>
@@ -368,17 +377,18 @@ export default function ChatUI({ userID }: { userID: number }) {
                         <div className="flex justify-start">
                             <div className="flex gap-2 max-w-[80%] items-start">
                                 <div className="bg-[#1e1e1e] px-4 py-3 rounded-2xl rounded-tl-none shadow-inner text-sm text-gray-400 animate-pulse">
-                                    Đang suy nghĩ...
+                                    Thinking...
                                 </div>
                             </div>
                         </div>
                     )}
 
                     <div ref={bottomRef} />
+
                 </div>
 
                 {/* Chat Input */}
-                <div className="px-2 bg-[#0f0f0f] border-t-2 border-gray-800 rounded-t-4xl shadow-[0_-8px_24px_rgba(0,0,0,0.4)]">
+                <div className="px-2 w-[80%] mx-auto bg-[#1a1a1a] border-t-2 border-gray-800 rounded-t-4xl shadow-[0_-8px_24px_rgba(0,0,0,0.4)]">
                     <ChatInput
                         onSend={(text) => handleSend(text, deepResearch)}
                         isStreaming={isStreaming}

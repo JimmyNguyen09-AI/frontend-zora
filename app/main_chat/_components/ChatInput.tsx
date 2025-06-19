@@ -83,7 +83,7 @@ export default function ChatInput({
     }
 
     return (
-        <div className="w-full  px-3 py-4  ">
+        <div className="w-[full]  px-3 py-4  ">
             <div className="bg-[#1f1f1f] border border-[#333] rounded-full px-5 py-3 flex items-center gap-3 shadow-lg focus-within:ring-2 focus-within:ring-white/20 transition-all">
                 {/* Attach button */}
                 <div className="relative">

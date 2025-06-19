@@ -30,7 +30,7 @@ export default function ChatHistory({ history, selected, onSelect, onDelete }: P
                 {history.map((item) => (
                     <div
                         key={item.id}
-                        className={`group flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer transition-all duration-200 
+                        className={`group relative flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer transition-all duration-200
                             ${selected === item.id
                                 ? 'bg-gray-300 dark:bg-gray-700'
                                 : 'hover:bg-gray-200 dark:hover:bg-gray-800'
@@ -51,6 +51,19 @@ export default function ChatHistory({ history, selected, onSelect, onDelete }: P
                                 onDelete(item.id)
                             }}
                         />
+                        {/* Preview on hover */}
+                        {item.messages?.length > 0 && (
+                            <div className="absolute left-full top-1/2 z-20 ml-2 w-56 -translate-y-1/2 rounded-lg border border-gray-400 bg-white p-3 text-xs shadow-lg dark:bg-[#2a2a2a] dark:text-white hidden group-hover:block">
+                                <p className="font-semibold text-black dark:text-gray-100 truncate">
+                                    {item.messages[0].question}
+                                </p>
+                                {item.messages[0].answer && (
+                                    <p className="mt-1 text-gray-600 dark:text-gray-300 truncate">
+                                        {item.messages[0].answer}
+                                    </p>
+                                )}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

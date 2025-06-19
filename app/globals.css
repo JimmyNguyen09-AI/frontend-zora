@@ -3,14 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* app/globals.css */
-html {
-  transition: background-color 0.5s, color 0.5s;
+html,
+body {
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-body {
-  transition: background-color 0.5s, color 0.5s;
-}
 
 @theme inline {
   --color-background: var(--background);
