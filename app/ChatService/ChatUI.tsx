@@ -54,6 +54,7 @@ export default function ChatUI({ userID }: { userID: number }) {
     const [voiceRecording, setVoiceRecording] = useState<boolean>(false)
     const [isOpen, setIsOpen] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
+    const [showActions, setShowActions] = useState(false)
     useClickOut(modalRef, () => {
         if (showHistory) setShowHistory(false);
     });
@@ -301,6 +302,8 @@ export default function ChatUI({ userID }: { userID: number }) {
                     theme={theme}
                     setTheme={setTheme}
                     newChat={handleNewConversation}
+                    showActions={showActions}
+                    setShowActions={setShowActions}
                 />
 
                 {/* Chat Content */}

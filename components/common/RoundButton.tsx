@@ -13,7 +13,7 @@ const RoundButton: React.FC<RoundButtonProps> = ({ onClick, Icon }) => {
              hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer
              rounded-full w-9 h-9 inline-flex items-center justify-center ml-2 mb-2 md:mb-0"
         >
-            <Icon className="w-5 h-5" />
+            <Icon className="w-6 h-6" />
         </button>
     );
 };
