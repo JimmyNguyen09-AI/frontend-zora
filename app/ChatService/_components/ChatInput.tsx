@@ -140,14 +140,14 @@ export default function ChatInput({
                         onClick={() => setVoiceRecording(false)}
                         className="bg-black/20 text-black dark:bg-white  p-2 rounded-full hover:opacity-90 disabled:opacity-50 transition cursor-pointer  "
                     >
-                        <AudioLines size={16} />
+                        <EarOff size={16} />
                     </button>
                 ) : (
                     <button
                         onClick={() => setVoiceRecording(true)}
                         className="bg-black/20 text-black dark:bg-white  p-2 rounded-full hover:opacity-90 disabled:opacity-50 transition cursor-pointer  "
                     >
-                        <EarOff size={16} />
+                        <AudioLines size={16} />
                     </button>
                 )}
                 {/* Gửi hoặc Stop */}

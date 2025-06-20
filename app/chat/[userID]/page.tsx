@@ -1,6 +1,6 @@
 'use client'
 import { useParams } from 'next/navigation'
-import ChatUI from '../../main_chat/ChatUI'
+import ChatUI from '../../ChatService/ChatUI'
 
 export default function ChatPageWrapper() {
     const rawParams = useParams() as { userID: string }

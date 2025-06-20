@@ -11,10 +11,12 @@ import ChatHistory from './_components/ChatHistory'
 import { ChevronsLeft, Menu, PencilLine, Link, ChevronsRight, X, TextSearch, Slash } from "lucide-react"
 import ConfirmBlock from '../../components/ConfirmBlock'
 import { useTheme } from 'next-themes'
-import { ModeToggle } from '../_components/DarkMode'
+import { ModeToggle } from '../../components/DarkMode'
 import Image from 'next/image'
 import TypingTitle from './_components/Typer'
 import ChatHeader from './_components/ChatHeader'
+import LoadingDots from '@/components/LoadingDots'
+import { useClickOut } from '@/custom_hook/useClickOut'
 interface Message {
     question: string
     answer: string
@@ -50,6 +52,11 @@ export default function ChatUI({ userID }: { userID: number }) {
     const [showWebSearches, setShowWebSearches] = useState(false)
     const { theme, setTheme } = useTheme()
     const [voiceRecording, setVoiceRecording] = useState<boolean>(false)
+    const [isOpen, setIsOpen] = useState(false);
+    const modalRef = useRef<HTMLDivElement>(null);
+    useClickOut(modalRef, () => {
+        if (showHistory) setShowHistory(false);
+    });
     useEffect(() => {
         if (!userID) return
         fetch(`http://127.0.0.1:8000/conversations/user/${userID}`)
@@ -265,7 +272,7 @@ export default function ChatUI({ userID }: { userID: number }) {
             {/* History */}
             {showHistory && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/10 backdrop-blur-sm">
-                    <div className="relative bg-white/80 dark:bg-[#1a1a1a] border border-gray-800 rounded-xl w-full max-w-sm max-h-[80vh] p-4 pt-12 overflow-y-auto text-black dark:text-white">
+                    <div className="relative bg-white/80 dark:bg-[#1a1a1a] border border-gray-800 rounded-xl w-full max-w-sm max-h-[80vh] p-4 pt-12 overflow-y-auto text-black dark:text-white" ref={modalRef}>
                         <button onClick={handleNewConversation} className='cursor-pointer absolute top-2 left-2'>
                             <PencilLine size={24} />
                         </button>
@@ -293,126 +300,134 @@ export default function ChatUI({ userID }: { userID: number }) {
                     onToggleHistory={() => setShowHistory(prev => !prev)}
                     theme={theme}
                     setTheme={setTheme}
+                    newChat={handleNewConversation}
                 />
 
                 {/* Chat Content */}
-                <div ref={containerRef} className="flex-1 mx- w-[95%] md:w-[80%] ml-[2.5%] md:mx-auto overflow-y-auto p-6 space-y-6 bg-white dark:bg-[#1a1a1a] ">
-
-                    {!messages.length && (
-                        <div className="flex flex-col items-center justify-center h-[70%]">
-                            <Image src="/ai-unscreen.gif" alt="Logo" width={200} height={200} />
-                            <div className='flex justify-center items-center '><TypingTitle words={['Hỏi ZORA bất cứ điều gì ^^', 'Ngày hôm nay của hôm mie thế nào ^^', 'Oh sheet tôi đã lỡ va phải ánh mắt của bạn :3', 'Chat với tôi nhé :>']} />
-                            </div>
-                        </div>
+                <div className="flex-1 w-full overflow-y-auto" ref={containerRef}>
+                    <div className="w-[95%] md:w-[80%] mx-auto p-6 space-y-6 bg-white dark:bg-[#1a1a1a]">
 
 
-                    )
-                    }
-                    {messages.map((m, i) => (
-                        <div key={i} className="space-y-4">
-                            {/* User message */}
-                            <div className="flex justify-end">
-                                <div className="flex gap-2 max-w-[75%] items-end">
-                                    <div className="bg-black/10 dark:bg-[#2d2d2d] text-black dark:text-white px-4 py-3 rounded-2xl rounded-br-none shadow text-sm whitespace-pre-wrap">
-                                        {m.question}
-                                    </div>
+                        {!messages.length && (
+                            <div className="flex flex-col items-center justify-center h-[70%]">
+                                <Image src="/ai-unscreen.gif" alt="Logo" width={200} height={200} />
+                                <div className='flex justify-center items-center '><TypingTitle words={['Hỏi ZORA bất cứ điều gì ^^', 'Ngày hôm nay của hôm mie thế nào ^^', 'Oh sheet tôi đã lỡ va phải ánh mắt của bạn :3', 'Chat với tôi nhé :>']} />
                                 </div>
                             </div>
 
-                            {/* AI message */}
-                            <div className="flex justify-start ">
-                                <div className="flex max-w-[90%] items-start">
-                                    <div className="w-9 h-9 rounded-full flex-shrink-0 overflow-hidden">
-                                        {i === messages.length - 1 && isStreaming ? (
-                                            <Image
-                                                src="/loading.gif"
-                                                alt="Loading"
-                                                width={36}
-                                                height={36}
-                                                className="object-contain w-full h-full"
-                                            />
-                                        ) : (
-                                            <Image
-                                                src="/logo-JN.png"
-                                                alt="Bot"
-                                                width={36}
-                                                height={36}
-                                                className="object-contain w-full h-full"
-                                            />
-                                        )}
-                                    </div>
 
-
-                                    <div className="pl-2 mt-2 text-black dark:text-white rounded-2xl overflow-x-auto text-sm leading-relaxed">
-                                        <ReactMarkdown
-                                            remarkPlugins={[remarkGfm]}
-                                            components={{
-                                                code({ inline, className, children, ...props }: any) {
-                                                    const match = /language-(\w+)/.exec(className || '');
-                                                    const codeString = Array.isArray(children) ? children.join('') : String(children);
-                                                    return !inline && match ? (
-                                                        <CodeBlock language={match[1]} code={codeString.trim()} />
-                                                    ) : (
-                                                        <code className="bg-gray-600 dark:bg-gray-800 text-green-300 rounded px-1 font-mono text-sm" {...props}>
-                                                            {codeString}
-                                                        </code>
-                                                    );
-                                                },
-                                            }}
-                                        >
-                                            {m.answer}
-                                        </ReactMarkdown>
-
-                                    </div>
-                                </div>
-                            </div>
-                            {m.webSearches && m.webSearches.length > 0 && (
-                                <div className="flex flex-row gap-4">
-                                    {m.webSearches.map((url, i) => (
-                                        <div key={`search-${i}`} className="flex items-center text-sm text-blue-400 rounded-lg py-1 max-w-[90%]">
-                                            <Link size={10} className="ml-1 text-white" />
-
-                                            <a href={url} target="_blank" className="underline break-all">{
-                                                url.split("/")[2]}</a>
+                        )
+                        }
+                        {messages.map((m, i) => (
+                            <div key={i} className="space-y-4">
+                                {/* User message */}
+                                <div className="flex justify-end">
+                                    <div className="flex gap-2 max-w-[75%] items-end">
+                                        <div className="bg-black/10 dark:bg-[#2d2d2d] text-black dark:text-white px-4 py-3 rounded-2xl rounded-br-none shadow text-sm whitespace-pre-wrap">
+                                            {m.question}
                                         </div>
-                                    ))}
+                                    </div>
                                 </div>
-                            )}
 
-                        </div>
-                    ))}
+                                {/* AI message */}
+                                <div className="flex justify-start ">
+                                    <div className="flex max-w-[90%] items-start">
+                                        <div className="w-9 h-9 rounded-full flex-shrink-0 overflow-hidden">
+                                            {i === messages.length - 1 && isStreaming ? (
+                                                <Image
+                                                    src="/loading.gif"
+                                                    alt="Loading"
+                                                    width={36}
+                                                    height={36}
+                                                    className="object-contain w-full h-full"
+                                                />
+                                            ) : (
+                                                <Image
+                                                    src="/logo-JN.png"
+                                                    alt="Bot"
+                                                    width={36}
+                                                    height={36}
+                                                    className="object-contain w-full h-full"
+                                                />
+                                            )}
+                                        </div>
 
 
+                                        <div className="pl-2 mt-2 text-black dark:text-white rounded-2xl overflow-x-auto text-sm leading-relaxed">
+                                            <ReactMarkdown
+                                                remarkPlugins={[remarkGfm]}
+                                                components={{
+                                                    code({ inline, className, children, ...props }: any) {
+                                                        const match = /language-(\w+)/.exec(className || '');
+                                                        const codeString = Array.isArray(children) ? children.join('') : String(children);
+                                                        return !inline && match ? (
+                                                            <CodeBlock language={match[1]} code={codeString.trim()} />
+                                                        ) : (
+                                                            <code className="bg-gray-200 dark:bg-gray-800 text-blue-600 dark:text-green-300 rounded px-1 font-mono text-sm" {...props}>
+                                                                {codeString}
+                                                            </code>
+                                                        );
+                                                    },
+                                                }}
+                                            >
+                                                {m.answer}
+                                            </ReactMarkdown>
 
-                    <div>
-                        {showWebSearches && webSearches.map((url, i) => (
-                            <div key={`search-${i}`} className="flex items-center justify-start text-sm text-blue-400  rounded-lg px-4 py-2 max-w-[90%]">
-                                <span className='text-white'>
-                                    <Link size={15} />
-                                </span>
-                                <a href={url} target="_blank" className="underline ml-1">{url}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {m.webSearches && m.webSearches.length > 0 && (
+                                    <div className="flex flex-row gap-4">
+                                        {m.webSearches.map((url, i) => (
+                                            <div key={`search-${i}`} className="flex items-center text-sm text-blue-400 rounded-lg py-1 max-w-[90%]">
+                                                <Link size={10} className="ml-1 mr-1 text-white" />
+
+                                                <a href={url} target="_blank" className="underline break-all">{
+                                                    url.split("/")[2]}</a>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
                             </div>
                         ))}
-                    </div>
 
 
-                    {/* Nếu đang suy nghĩ và chưa có phản hồi */}
-                    {isStreaming && messages[messages.length - 1]?.answer === '' && (
-                        <div className="flex justify-start">
-                            <div className="flex gap-2 max-w-[80%] items-start">
-                                <div className="bg-while/20 dark:bg-[#1e1e1e] px-4 py-3 rounded-2xl rounded-tl-none shadow-inner text-sm text-gray-800 animate-pulse">
-                                    Thinking...
+
+                        <div>
+                            {showWebSearches && webSearches.map((url, i) => (
+                                <div key={`search-${i}`} className="flex items-center justify-start text-sm text-blue-400  rounded-lg px-4 py-2 max-w-[90%]">
+                                    <span className='text-white'>
+                                        <Link size={15} />
+                                    </span>
+                                    <a href={url} target="_blank" className="underline ml-1">{url}</a>
+                                </div>
+                            ))}
+                        </div>
+
+
+                        {/* Nếu đang suy nghĩ và chưa có phản hồi */}
+                        {isStreaming && messages[messages.length - 1]?.answer === '' && (
+                            <div className="flex justify-start">
+                                <div className="flex max-w-[80%] items-start">
+                                    <div className="bg-white/20  gap-2 flex items-center dark:bg-[#1e1e1e] px-4 py-3 rounded-2xl rounded-tl-none shadow-inner text-sm text-gray-800 dark:text-gray-100 animate-pulse">
+                                        <div>Thinking</div>
+                                        <LoadingDots />
+                                    </div>
+
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    <div ref={bottomRef} />
+                        <div ref={bottomRef} />
 
+
+                    </div>
                 </div>
 
+
                 {/* Chat Input */}
-                <div className="px-2 w-full md:w-[80%] mx-auto robg-[#1a1a1a] border-t-2 border-gray-800 rounded-t-4xl shadow-[0_-8px_24px_rgba(0,0,0,0.4)]">
+                <div className="px-2 w-full md:w-[80%] mx-auto robg-[#1a1a1a] border-t-2 border-gray-800 rounded-t-4xl shadow-[0_-8px_24px_rgba(0,0,0,0.4)]" >
                     <ChatInput
                         onSend={(text) => handleSend(text, deepResearch)}
                         isStreaming={isStreaming}

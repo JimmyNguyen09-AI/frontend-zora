@@ -52,18 +52,7 @@ export default function ChatHistory({ history, selected, onSelect, onDelete }: P
                             }}
                         />
                         {/* Preview on hover */}
-                        {item.messages?.length > 0 && (
-                            <div className="absolute left-full top-1/2 z-20 ml-2 w-56 -translate-y-1/2 rounded-lg border border-gray-400 bg-white p-3 text-xs shadow-lg dark:bg-[#2a2a2a] dark:text-white hidden group-hover:block">
-                                <p className="font-semibold text-black dark:text-gray-100 truncate">
-                                    {item.messages[0].question}
-                                </p>
-                                {item.messages[0].answer && (
-                                    <p className="mt-1 text-gray-600 dark:text-gray-300 truncate">
-                                        {item.messages[0].answer}
-                                    </p>
-                                )}
-                            </div>
-                        )}
+
                     </div>
                 ))}
             </div>
