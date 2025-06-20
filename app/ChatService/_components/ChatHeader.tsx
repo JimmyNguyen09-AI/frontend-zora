@@ -16,7 +16,7 @@ interface ChatHeaderProps {
 
 export default function ChatHeader({ onToggleHistory, theme, setTheme, newChat, showActions, setShowActions }: ChatHeaderProps) {
     return (
-        <div className="fixed top-0 left-0 w-full z-50 flex md:justify-between md:items-center p-1 md:p-4">
+        <div className="fixed top-7 left-1 md:top-0 md:left-0 w-full z-50 flex md:justify-between md:items-center p-1 md:p-4">
             <div className="flex items-center gap-2">
                 <div
                     className="w-14 h-14 md:w-20 md:h-14 cursor-pointer"

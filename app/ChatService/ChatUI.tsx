@@ -307,12 +307,10 @@ export default function ChatUI({ userID }: { userID: number }) {
                 />
 
                 {/* Chat Content */}
-                <div className="flex-1 w-full overflow-y-auto" ref={containerRef}>
-                    <div className="w-[95%] md:w-[80%] mx-auto p-6 space-y-6 bg-white dark:bg-[#1a1a1a]">
-
-
+                <div className="flex-1 w-full h-[50vh] overflow-y-auto" ref={containerRef}>
+                    <div className="w-[95%] md:w-[80%] mx-auto p-5 h-[90vh] bg-white dark:bg-[#1a1a1a]">
                         {!messages.length && (
-                            <div className="flex flex-col items-center justify-center h-[70%]">
+                            <div className="flex flex-col items-center justify-center h-full">
                                 <Image src="/ai-unscreen.gif" alt="Logo" width={200} height={200} />
                                 <div className='flex justify-center items-center '><TypingTitle words={['Hỏi ZORA bất cứ điều gì ^^', 'Ngày hôm nay của hôm mie thế nào ^^', 'Oh sheet tôi đã lỡ va phải ánh mắt của bạn :3', 'Chat với tôi nhé :>']} />
                                 </div>
